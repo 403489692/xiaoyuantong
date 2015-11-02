@@ -1,0 +1,25 @@
+package com.jlstudio.main.application;
+
+import android.app.Activity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by gzw on 2015/10/14.
+ */
+public class ActivityContror {
+    public static List<Activity> activities = new ArrayList<>();
+    public static void addActivity(Activity aty){
+        activities.add(aty);
+    }
+    public static void removeActivity(Activity aty){
+        activities.remove(aty);
+        aty.finish();
+    }
+    public static void finish(){
+        for(Activity aty:activities){
+            removeActivity(aty);
+        }
+    }
+}
