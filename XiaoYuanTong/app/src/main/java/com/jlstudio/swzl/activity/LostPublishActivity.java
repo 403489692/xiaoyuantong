@@ -1,6 +1,7 @@
 package com.jlstudio.swzl.activity;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,18 +13,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jlstudio.R;
 import com.jlstudio.main.activity.BaseActivity;
 import com.jlstudio.swzl.bean.lostfound;
 import com.jlstudio.swzl.httpNet.util;
+import com.jlstudio.weather.util.ActivityControl;
 
 import static com.jlstudio.swzl.httpNet.util.LostAndFound_publish;
 
 public class LostPublishActivity extends BaseActivity implements View.OnClickListener{
     private Spinner spinner_academy;
     private Spinner spinner_type;
+    private TextView title_name,back;//title 标题
     private RelativeLayout rela_xuehao;
     private RelativeLayout rela_name;
     private RelativeLayout rela_phone;
@@ -52,7 +56,7 @@ public class LostPublishActivity extends BaseActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lost_publish);
-        init();
+        initView();
         event();
 
         //系别选择的事件监听
@@ -113,7 +117,7 @@ public class LostPublishActivity extends BaseActivity implements View.OnClickLis
         cancle.setOnClickListener(this);
     }
 
-    private void init() {
+    private void initView() {
         spinner_academy = (Spinner) findViewById(R.id.lost_found_publish_academyspinner);
         spinner_type = (Spinner) findViewById(R.id.lost_found_publish_typespinner);
         rela_phone = (RelativeLayout) findViewById(R.id.lost_found_phone);
@@ -129,7 +133,12 @@ public class LostPublishActivity extends BaseActivity implements View.OnClickLis
         editText_phone = (EditText) findViewById(R.id.lost_found_publish_phone);
         editText_content = (EditText) findViewById(R.id.lost_found_publish_content);
         editText_title = (EditText) findViewById(R.id.lost_found_publish_title);
-
+        back = (TextView) findViewById(R.id.back);
+        title_name = (TextView) findViewById(R.id.title_name);
+        Typeface iconfont = Typeface.createFromAsset(getAssets(),"fonts/iconfont.ttf");
+        back.setTypeface(iconfont);
+        title_name.setText("发布");
+        back.setOnClickListener(this);
 
         submit = (Button) findViewById(R.id.lost_found_publish_submit);
         cancle = (Button) findViewById(R.id.lost_found_publish_cancel);
@@ -147,8 +156,13 @@ public class LostPublishActivity extends BaseActivity implements View.OnClickLis
                     break;
                 case R.id.lost_found_publish_cancel:
                     startActivity(new Intent(this, LostAndFound.class));
+                    ActivityControl.removeAty(this);
                     break;
                 case R.id.lost_found_publish_pic:
+                    break;
+                case R.id.back:
+                    startActivity(new Intent(this, LostAndFound.class));
+                    ActivityControl.removeAty(this);
                     break;
             }
     }

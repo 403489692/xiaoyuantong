@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Base64;
-import android.widget.ProgressBar;
 
 import com.jlstudio.main.bean.User;
 
@@ -15,8 +14,8 @@ import com.jlstudio.main.bean.User;
  */
 public class Config {
     //网络相关
-    //public static final String URL = "http://192.168.1.104:8080/xiaoyuantong/";
-    public static final String URL = "http://zmzmdr.com:8080/xiaoyuantong/";
+    public static final String URL = "http://192.168.1.104:8080/xiaoyuantong/";
+    //public static final String URL = "http://zmzmdr.com:8080/xiaoyuantong/";
     public static final String RECMSG = "GetRecMsg";
     public static final String SENDMSG = "GetSendMsg";
     public static final String GETDEPARTMENT = "GetDepartment";

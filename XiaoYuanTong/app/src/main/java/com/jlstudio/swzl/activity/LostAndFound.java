@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -19,7 +20,7 @@ import com.jlstudio.swzl.bean.lostfound;
 
 import java.util.ArrayList;
 
-public class LostAndFound extends BaseActivity implements OnClickListener{
+public class LostAndFound extends BaseActivity implements OnClickListener, AdapterView.OnItemClickListener {
     private LinearLayout linearLayout;
     private ArrayList<lostfound> lostfounds = new ArrayList<lostfound>();
     private ListView listView;
@@ -29,6 +30,10 @@ public class LostAndFound extends BaseActivity implements OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lost_and_found);
+        initView();
+    }
+
+    private void initView() {
         listView = (ListView) findViewById(R.id.lost_found_all_list);
         imageView_back = (ImageView) findViewById(R.id.lost_found_back);
         imageView_menu = (ImageView) findViewById(R.id.lost_found_menu);
@@ -39,7 +44,7 @@ public class LostAndFound extends BaseActivity implements OnClickListener{
         listView.setAdapter(lostAndFoundAdapter);
         imageView_menu.setOnClickListener(this);
         imageView_back.setOnClickListener(this);
-
+        listView.setOnItemClickListener(this);
     }
 
     private ArrayList<lostfound> getData() {
@@ -79,5 +84,17 @@ public class LostAndFound extends BaseActivity implements OnClickListener{
                 startActivity(new Intent(this,LostPublishActivity.class));
                 break;
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(this,"你点击了"+position,Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        intent.setClass(this, LostAndFoundDetail.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("lostandfound", lostfounds.get(position));
+        intent.putExtras(bundle);
+        startActivity(intent);
+
     }
 }

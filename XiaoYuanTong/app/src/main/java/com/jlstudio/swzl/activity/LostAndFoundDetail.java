@@ -3,7 +3,6 @@ package com.jlstudio.swzl.activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,6 +35,10 @@ public class LostAndFoundDetail extends BaseActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lost_and_found_detail);
+        initView();
+    }
+
+    private void initView() {
         firstcontent = (TextView) findViewById(R.id.lost_found_first_detail_content);
         firstnickname = (TextView) findViewById(R.id.lost_found_first_detail_nickname);
         firsttime = (TextView) findViewById(R.id.lost_found_first_detail_time);
@@ -67,8 +70,6 @@ public class LostAndFoundDetail extends BaseActivity implements View.OnClickList
         common_lv.setAdapter(lafda);
     }
 
-    private void setListViewHeightBasedOnChildren(ListView listView) {
-    }
 
     private ArrayList<commons> getData() {
         //根据id写上网络连接获取评论集合

@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,8 +23,10 @@ import com.jlstudio.iknow.activity.ScoreAty;
 import com.jlstudio.iknow.adapter.ScoreAdapter;
 import com.jlstudio.iknow.util.JsonUtil;
 import com.jlstudio.main.application.Config;
+import com.jlstudio.main.application.MyApplication;
 import com.jlstudio.main.bean.CatchData;
 import com.jlstudio.main.db.DBOption;
+import com.jlstudio.main.util.ProgressUtil;
 import com.jlstudio.publish.net.GetNotificationNet;
 import com.jlstudio.publish.util.ShowToast;
 import com.jlstudio.publish.util.StringUtil;
@@ -50,11 +53,11 @@ public class QueryScoreDialog extends Dialog implements CompoundButton.OnChecked
     private boolean saveuser = false;//是否保存用户名
     private CatchData data;//缓存数据
 
-    public QueryScoreDialog(Context context,int type) {
+    public QueryScoreDialog(Context context, int type) {
         super(context);
         this.context = context;
         this.type = type;
-        if(type == 0) servlet = Config.GETSCORE;
+        if (type == 0) servlet = Config.GETSCORE;
         else servlet = Config.SCHEDULE;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_query);
@@ -65,8 +68,8 @@ public class QueryScoreDialog extends Dialog implements CompoundButton.OnChecked
     }
 
     private void initUser() {
-       String user = Config.loadQueryuser(context);
-        if(!StringUtil.isEmpty(user)){
+        String user = Config.loadQueryuser(context);
+        if (!StringUtil.isEmpty(user)) {
             String[] up = user.split(",");
             username.setText(up[0]);
             password.setText(up[1]);
@@ -75,26 +78,26 @@ public class QueryScoreDialog extends Dialog implements CompoundButton.OnChecked
     }
 
     private void initData(String user, String pwd) {
-        data = db.getCatch(Config.URL+servlet+user);
-        if(data == null){
-            getDatasFromNet(user,pwd);
-        }else{
+        data = db.getCatch(Config.URL + servlet + user);
+        if (data == null) {
+            getDatasFromNet(user, pwd);
+        } else {
             Long time = System.currentTimeMillis();
             long catchtime = Long.parseLong(data.getTime());
-            if((time - catchtime) > (1000*60*24*30*6)){
-                getDatasFromNet(user,pwd);
-            }else{
+            if ((time - catchtime) > (1000 * 60 * 24 * 30 * 6)) {
+                getDatasFromNet(user, pwd);
+            } else {
                 Intent intent = null;
-                if(type == 0){
+                if (type == 0) {
                     intent = new Intent(context, ScoreAty.class);
-                }else{
+                } else {
                     intent = new Intent(context, ScheduleAty.class);
                 }
                 intent.putExtra("data", data.getContent());
                 context.startActivity(intent);
-                if(saveuser == true){
+                if (saveuser == true) {
                     Config.saveQueryuser(context, user + "," + pwd);
-                }else{
+                } else {
                     Config.saveQueryuser(context, "");
                 }
                 dismiss();
@@ -109,8 +112,8 @@ public class QueryScoreDialog extends Dialog implements CompoundButton.OnChecked
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         int width = Config.loadDisplay(context);
         //if(width <= 480){
-            lp.width = (int) (dm.widthPixels * 0.8);
-            lp.height = (int) (dm.heightPixels * 0.5);
+        lp.width = (int) (dm.widthPixels * 0.8);
+        lp.height = (int) (dm.heightPixels * 0.5);
 //        }else{
 //            lp.width = 600;
 //            lp.height = 500;
@@ -130,15 +133,16 @@ public class QueryScoreDialog extends Dialog implements CompoundButton.OnChecked
                 String pwd = password.getText().toString();
                 if (StringUtil.isEmpty(user, pwd)) {
                     ShowToast.show(context, "用户名或密码不能为空");
-                } else {
-                    initData(user, pwd);
+                    return;
                 }
+                initData(user, pwd);
             }
         });
     }
 
 
     private void getDatasFromNet(final String user, final String pwd) {
+        ProgressUtil.closeProgressDialog();
         JSONObject json = new JSONObject();
 //        if(type == 0) servlet = Config.GETSCORE;
 //        else servlet = Config.SCHEDULE;
@@ -157,36 +161,23 @@ public class QueryScoreDialog extends Dialog implements CompoundButton.OnChecked
                     String status = json.getString("status");
                     if (status.equals("success")) {
                         if (data == null) {
-                            db.insertCatch(Config.URL + servlet+user, s, System.currentTimeMillis() + "");
+                            db.insertCatch(Config.URL + servlet + user, s, System.currentTimeMillis() + "");
                         } else {
-                            db.updateCatch(Config.URL + servlet+user, s, System.currentTimeMillis() + "");
+                            db.updateCatch(Config.URL + servlet + user, s, System.currentTimeMillis() + "");
                         }
-                        if(saveuser == true){
+                        if (saveuser == true) {
                             Config.saveQueryuser(context, user + "," + pwd);
-                        }else{
+                        } else {
                             Config.saveQueryuser(context, "");
                         }
                         Intent intent = null;
-                        if(type == 0){
+                        if (type == 0) {
                             intent = new Intent(context, ScoreAty.class);
-                        }else{
+                        } else {
                             intent = new Intent(context, ScheduleAty.class);
                         }
                         intent.putExtra("data", s);
-//                        if(saveuser == true){
-//                            if(user == null){
-//                                db.insertCatch("queryuser", user+","+pwd, System.currentTimeMillis() + "");
-//                            }else{
-//                                db.updateCatch("queryuser", user + "," + pwd, System.currentTimeMillis() + "");
-//                            }
-//
-//                        }else{
-//                            if(user == null){
-//                                db.insertCatch("queryuser", "0", System.currentTimeMillis() + "");
-//                            }else{
-//                                db.updateCatch("queryuser", "0", System.currentTimeMillis() + "");
-//                            }
-//                        }
+                        ProgressUtil.closeProgressDialog();
                         context.startActivity(intent);
                         dismiss();
                     } else {
@@ -204,15 +195,16 @@ public class QueryScoreDialog extends Dialog implements CompoundButton.OnChecked
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 ShowToast.show(context, "获取数据失败");
+                ProgressUtil.closeProgressDialog();
             }
         }, json.toString());
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(isChecked == true){
+        if (isChecked == true) {
             saveuser = true;
-        }else{
+        } else {
             saveuser = false;
         }
     }

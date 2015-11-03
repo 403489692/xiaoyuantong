@@ -17,6 +17,8 @@ import com.jlstudio.R;
 import com.jlstudio.main.application.Config;
 import com.jlstudio.main.bean.CatchData;
 import com.jlstudio.main.db.DBOption;
+import com.jlstudio.main.util.ProgressUtil;
+import com.jlstudio.main.widget.SwipeRefreshLayout;
 import com.jlstudio.publish.activity.ShowSendPublishAty;
 import com.jlstudio.publish.adapter.PublishDatasAdapter;
 import com.jlstudio.publish.bean.PublishData;
@@ -31,7 +33,7 @@ import java.util.List;
  * Created by gzw on 2015/10/16.
  */
 public class FMyPublish extends Fragment implements AdapterView.OnItemClickListener {
-    private View view;
+    private SwipeRefreshLayout view;
     private ListView listView;
     private PublishDatasAdapter adapter;
     private List<PublishData> list;
@@ -42,7 +44,7 @@ public class FMyPublish extends Fragment implements AdapterView.OnItemClickListe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_publish_datas, container, false);
+        view = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_publish_datas, container, false);
         action = getActivity().getIntent().getAction();
         gn = GetNotificationNet.getInstence(getActivity());
 
@@ -68,6 +70,7 @@ public class FMyPublish extends Fragment implements AdapterView.OnItemClickListe
             long catchtime = Long.parseLong(data.getTime());
             if((time - catchtime) > Config.CATCHTIME||action!=null){
                 action = null;
+
                 getDatasFromNet();
             }else{
                 list = JsonToPubhlishData.getPublishDataSend(data.getContent());
@@ -85,6 +88,13 @@ public class FMyPublish extends Fragment implements AdapterView.OnItemClickListe
 //        }
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
+        view.setColorScheme(R.color.fresh_one, R.color.fresh_two, R.color.fresh_three, R.color.fresh_four);
+        view.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getDatasFromNet();
+            }
+        });
     }
 
     @Override
@@ -96,6 +106,7 @@ public class FMyPublish extends Fragment implements AdapterView.OnItemClickListe
     }
 
     private void getDatasFromNet(){
+        //ProgressUtil.showProgressDialog(getActivity(),"数据加载");
         gn.getDepartment(Config.URL, Config.SENDMSG, new Response.Listener<String>() {
 
             @Override
@@ -108,10 +119,14 @@ public class FMyPublish extends Fragment implements AdapterView.OnItemClickListe
                     }
                     list = JsonToPubhlishData.getPublishDataSend(s);
                     adapter.setList(list);
+
+
                 } else {
                     ShowToast.show(getActivity(), "没有通知");
                     list = new ArrayList<>();
                 }
+                view.setRefreshing(false);
+                //ProgressUtil.closeProgressDialog();
                 Log.d("hehe", s);
             }
         }, new Response.ErrorListener() {
@@ -119,6 +134,8 @@ public class FMyPublish extends Fragment implements AdapterView.OnItemClickListe
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 ShowToast.show(getActivity(), "获取数据失败");
+                //ProgressUtil.closeProgressDialog();
+                view.setRefreshing(false);
                 Log.d("hehe", "error");
             }
         }, Config.loadUser(getActivity()).getUsername());

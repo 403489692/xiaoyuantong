@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Response;
@@ -18,8 +19,10 @@ import com.android.volley.VolleyError;
 import com.jlstudio.R;
 import com.jlstudio.iknow.activity.CETScoreAty;
 import com.jlstudio.main.application.Config;
+import com.jlstudio.main.application.MyApplication;
 import com.jlstudio.main.bean.CatchData;
 import com.jlstudio.main.db.DBOption;
+import com.jlstudio.main.util.ProgressUtil;
 import com.jlstudio.publish.activity.SelectPersonAty;
 import com.jlstudio.publish.adapter.SelectDepartmentadapter;
 import com.jlstudio.publish.net.GetNotificationNet;
@@ -40,7 +43,7 @@ import java.util.List;
 public class QueryDialog extends Dialog {
     private Context context;
     private EditText username, password;
-    private TextView title_name,uid,pwd;
+    private TextView title_name, uid, pwd;
     private Button submit;
     private GetNotificationNet gn;
 
@@ -52,14 +55,15 @@ public class QueryDialog extends Dialog {
         gn = new GetNotificationNet(context);
         initView();
     }
+
     private void initView() {
         Window dialogwindow = getWindow();
         WindowManager.LayoutParams lp = dialogwindow.getAttributes();
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         int width = Config.loadDisplay(context);
-       // if(width <= 480){
-            lp.width = (int) (dm.widthPixels * 0.8);
-            lp.height = (int) (dm.heightPixels * 0.45);
+        // if(width <= 480){
+        lp.width = (int) (dm.widthPixels * 0.8);
+        lp.height = (int) (dm.heightPixels * 0.45);
 //        }else{
 //            lp.width = 600;
 //            lp.height = 500;
@@ -81,15 +85,18 @@ public class QueryDialog extends Dialog {
                 String pwd = password.getText().toString();
                 if (StringUtil.isEmpty(user, pwd)) {
                     ShowToast.show(context, "用户名或密码不能为空");
-                } else {
-                    getDatasFromNet(user, pwd);
+                    return;
                 }
+
+                getDatasFromNet(user, pwd);
             }
+
         });
     }
 
 
     private void getDatasFromNet(final String user, String pwd) {
+        ProgressUtil.showProgressDialog(context, "数据加载");
         JSONObject json = new JSONObject();
         String servlet = null;
         try {
@@ -118,13 +125,14 @@ public class QueryDialog extends Dialog {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
+                ProgressUtil.closeProgressDialog();
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 ShowToast.show(context, "获取数据失败");
+                ProgressUtil.closeProgressDialog();
             }
         }, json.toString());
     }

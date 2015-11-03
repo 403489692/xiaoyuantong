@@ -21,18 +21,26 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.jlstudio.R;
 import com.jlstudio.main.activity.BaseActivity;
+import com.jlstudio.main.activity.LoginAty;
 import com.jlstudio.main.activity.MainActivity;
 import com.jlstudio.main.application.ActivityContror;
 import com.jlstudio.main.application.Config;
+import com.jlstudio.main.bean.User;
 import com.jlstudio.publish.dialog.SelectPublishType;
 import com.jlstudio.publish.fragment.FMyPublish;
 import com.jlstudio.publish.fragment.FMyReceive;
 import com.jlstudio.publish.net.GetNotificationNet;
 import com.jlstudio.publish.util.JsonToPubhlishData;
 import com.jlstudio.publish.util.ShowToast;
+import com.jlstudio.publish.util.StringUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Set;
+
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
 
 public class PublishDatasAty extends BaseActivity implements View.OnClickListener{
     private TextView myReceive,myPublish,back,title_name;
@@ -44,6 +52,29 @@ public class PublishDatasAty extends BaseActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_publish_datas);
+        User user = Config.loadUser(this);
+        if(StringUtil.isEmpty(user.getUsername())){
+            user = Config.loadBaseUser(this);
+            if(StringUtil.isEmpty(user.getUsername())){
+                startActivity(new Intent(this,LoginAty.class));
+                ActivityContror.removeActivity(this);
+            }else{
+                Config.saveUser(this,user);
+                JPushInterface.setAlias(this, user.getUsername(), new TagAliasCallback() {
+                    @Override
+                    public void gotResult(int i, String s, Set<String> set) {
+                        Log.d("hehe", i + "");
+                    }
+                });
+            }
+        }else{
+            JPushInterface.setAlias(this, user.getUsername(), new TagAliasCallback() {
+                @Override
+                public void gotResult(int i, String s, Set<String> set) {
+                    Log.d("hehe", i + "");
+                }
+            });
+        }
         initView();
         currentFragment = new FMyReceive();
         getFragmentManager().beginTransaction().add(R.id.fragment,currentFragment).commit();

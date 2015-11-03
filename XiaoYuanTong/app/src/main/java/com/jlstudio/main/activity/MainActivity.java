@@ -49,32 +49,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if(!Config.isNetworkAvailable(this)){
-            ShowToast.show(this,"网络好像发生了错误");
+            ShowToast.show(this, "网络好像发生了错误");
         }
         if(Config.isFirst(this)){
-            startActivity(new Intent(this,WelcomeAty.class));
+            startActivity(new Intent(this, WelcomeAty.class));
             ActivityContror.removeActivity(this);
             return;
         }
-        String username = "";
-        if(!StringUtil.isEmpty(getIntent().getAction())){
-            username = Config.loadUser(this).getUsername();
-        }else{
-            Config.saveUser(this,Config.loadBaseUser(this));
-            username = Config.loadUser(this).getUsername();
-        }
-        if(StringUtil.isEmpty(username)){
-            startActivity(new Intent(this,LoginAty.class));
-            ActivityContror.removeActivity(this);
-        }
-        //给用户注册推送别名
-        Log.d("hehe",username);
-        JPushInterface.setAlias(this, username, new TagAliasCallback() {
-            @Override
-            public void gotResult(int i, String s, Set<String> set) {
-                Log.d("hehe", i + "");
-            }
-        });
         initView();
         initFragment();
 

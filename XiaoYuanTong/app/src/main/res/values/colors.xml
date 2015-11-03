@@ -32,4 +32,9 @@
     <color name="td_two">#eee0e5</color>
     <color name="td_three">#cdc1c5</color>
     <color name="td_four">#cccccc</color>
+    <!--刷新条色-->
+    <color name="fresh_one">#ff0000</color>
+    <color name="fresh_two">#00ff00</color>
+    <color name="fresh_three">#0000ff</color>
+    <color name="fresh_four">#000000</color>
 </resources>

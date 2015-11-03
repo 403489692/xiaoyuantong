@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jlstudio.R;
+import com.jlstudio.main.adapter.PageAdapter;
 import com.jlstudio.swzl.activity.LostAndFoundDetail;
 import com.jlstudio.swzl.bean.lostfound;
 
@@ -50,34 +51,36 @@ public class LostAndFoundAdapter extends BaseAdapter{
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         //获取当前item对应的对象
-        lf = allLostFound.get(position);
-        convertView = inflater.inflate(R.layout.lostandfound_item, null);
-
-        TextView title = (TextView) convertView.findViewById(R.id.lost_found_title);
-        TextView nickname = (TextView) convertView.findViewById(R.id.lost_found_nickname);
-        TextView comment_count = (TextView) convertView.findViewById(R.id.lost_found_count);
-        TextView time = (TextView) convertView.findViewById(R.id.lost_found_time);
-        LinearLayout linearLayout = (LinearLayout) convertView.findViewById(R.id.lost_found_linear);
-
-
-        title.setText(lf.getTitle());
-        nickname.setText(lf.getNickname());
-        comment_count.setText("1");
-        time.setText(lf.getTime());
-
-        class ItemAdapter implements View.OnClickListener{
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context,"你点击了"+position,Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent();
-                intent.setClass(context, LostAndFoundDetail.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("lostandfound", allLostFound.get(position));
-                intent.putExtras(bundle);
-                context.startActivity(intent);
-            }
+        ViewHolder item;
+        if(convertView == null){
+            convertView = inflater.inflate(R.layout.lostandfound_item, null);
+            TextView title = (TextView) convertView.findViewById(R.id.lost_found_title);
+            TextView nickname = (TextView) convertView.findViewById(R.id.lost_found_nickname);
+            TextView comment_count = (TextView) convertView.findViewById(R.id.lost_found_count);
+            TextView time = (TextView) convertView.findViewById(R.id.lost_found_time);
+            item = new ViewHolder(title,nickname,comment_count,time);
+            convertView.setTag(item);
+        }else{
+            item = (ViewHolder) convertView.getTag();
         }
-        linearLayout.setOnClickListener(new ItemAdapter());
+        lf = allLostFound.get(position);
+        item.title.setText(lf.getTitle());
+        item.nickname.setText(lf.getNickname());
+        item.comment_count.setText("1");
+        item.time.setText(lf.getTime());
         return convertView;
+    }
+    private class ViewHolder{
+        public TextView title;
+        public TextView nickname;
+        public TextView comment_count;
+        public TextView time;
+
+        public ViewHolder(TextView title, TextView nickname, TextView comment_count, TextView time) {
+            this.title = title;
+            this.nickname = nickname;
+            this.comment_count = comment_count;
+            this.time = time;
+        }
     }
 }

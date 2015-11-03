@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Response;
@@ -21,6 +22,7 @@ import com.jlstudio.main.application.Config;
 import com.jlstudio.main.bean.User;
 import com.jlstudio.main.net.GetDataNet;
 import com.jlstudio.main.util.JsonToBean;
+import com.jlstudio.main.util.ProgressUtil;
 import com.jlstudio.publish.util.ShowToast;
 import com.jlstudio.publish.util.StringUtil;
 
@@ -45,16 +47,6 @@ public class LoginAty extends BaseActivity implements View.OnClickListener {
         Display dis = wm.getDefaultDisplay();
         Config.saveDisplay(this, dis.getWidth());
         initView();
-//        User user = Config.loadBaseUser(this);
-//        if(!StringUtil.isEmpty(user.getUsername(),getIntent().getAction())){
-//            Config.saveUser(this,Config.loadBaseUser(this));
-//            startActivity(new Intent(this,MainActivity.class));
-//            ActivityContror.removeActivity(this);
-//        }else{
-//            if(!Config.isNetworkAvailable(this)){
-//                ShowToast.show(this, "网络好像发生了错误");
-//            }
-//        }
     }
 
     private void initView() {
@@ -72,19 +64,16 @@ public class LoginAty extends BaseActivity implements View.OnClickListener {
             ShowToast.show(this, "用户名或密码不能为空");
             return;
         }
+        ProgressUtil.showProgressDialog(this,"登陆中");
         gn.getUserData(Config.URL, Config.LOGIN, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 try {
                     JSONObject json = new JSONObject(s);
-                    Log.d("hehe", s);
                     if (json.getString("status").equals("succeed")) {
-
                         User user = JsonToBean.getUser(json);
+                        ProgressUtil.closeProgressDialog();
                         new LoginQuery(LoginAty.this,user).show();
-                        //Config.saveUser(LoginAty.this, user);
-//                        startActivity(new Intent(LoginAty.this, MainActivity.class));
-//                        ActivityContror.removeActivity(LoginAty.this);
                     } else {
                         ShowToast.show(LoginAty.this, "用户名密码错误");
                     }

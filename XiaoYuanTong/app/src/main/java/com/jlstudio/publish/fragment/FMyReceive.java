@@ -16,8 +16,11 @@ import com.android.volley.VolleyError;
 import com.jlstudio.R;
 import com.jlstudio.main.application.ActivityContror;
 import com.jlstudio.main.application.Config;
+import com.jlstudio.main.application.MyApplication;
 import com.jlstudio.main.bean.CatchData;
 import com.jlstudio.main.db.DBOption;
+import com.jlstudio.main.util.ProgressUtil;
+import com.jlstudio.main.widget.SwipeRefreshLayout;
 import com.jlstudio.publish.activity.ShowReceivePublishAty;
 import com.jlstudio.publish.activity.ShowSendPublishAty;
 import com.jlstudio.publish.adapter.PublishDatasAdapter;
@@ -33,7 +36,7 @@ import java.util.List;
  * Created by gzw on 2015/10/16.
  */
 public class FMyReceive extends Fragment implements AdapterView.OnItemClickListener {
-    private View view;
+    private SwipeRefreshLayout view;
     private ListView listView;
     private PublishDatasAdapter adapter;
     private List<PublishData> list;
@@ -44,11 +47,10 @@ public class FMyReceive extends Fragment implements AdapterView.OnItemClickListe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_publish_datas, container, false);
+        view = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_publish_datas, container, false);
         action = getActivity().getIntent().getAction();
         gn = GetNotificationNet.getInstence(getActivity());
         initListView();
-
         return view;
     }
 
@@ -69,6 +71,7 @@ public class FMyReceive extends Fragment implements AdapterView.OnItemClickListe
             Long time = System.currentTimeMillis();
             long catchtime = Long.parseLong(data.getTime());
             if((time - catchtime) > Config.CATCHTIME){
+
                 getDatasFromNet();
             }else{
                 list = JsonToPubhlishData.getPublishData(data.getContent());
@@ -86,6 +89,13 @@ public class FMyReceive extends Fragment implements AdapterView.OnItemClickListe
         adapter = new PublishDatasAdapter(getActivity(),list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
+        view.setColorScheme(R.color.fresh_one,R.color.fresh_two,R.color.fresh_three,R.color.fresh_four);
+        view.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getDatasFromNet();
+            }
+        });
     }
 
     @Override
@@ -97,6 +107,7 @@ public class FMyReceive extends Fragment implements AdapterView.OnItemClickListe
         startActivity(intent);
     }
     private void getDatasFromNet(){
+        //ProgressUtil.showProgressDialog(getActivity(),"数据加载");
         gn.getDepartment(Config.URL, Config.RECMSG,  new Response.Listener<String>() {
 
             @Override
@@ -110,17 +121,23 @@ public class FMyReceive extends Fragment implements AdapterView.OnItemClickListe
                     //Config.saveRecmsg(getActivity(), s);
                     list = JsonToPubhlishData.getPublishData(s);
                     adapter.setList(list);
+
+
                 }else{
                     ShowToast.show(getActivity(),"没有通知");
                     list = new ArrayList<PublishData>();
                 }
+                view.setRefreshing(false);
+                //ProgressUtil.closeProgressDialog();
                 Log.d("hehe", s);
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                ShowToast.show(getActivity(), "获取数据失败");
+                ShowToast.show(MyApplication.getContext(), "获取数据失败");
+                //ProgressUtil.closeProgressDialog();
+                view.setRefreshing(false);
             }
         }, Config.loadUser(getActivity()).getUsername());
     }

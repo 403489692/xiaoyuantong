@@ -46,15 +46,27 @@ public class LostAndFoundDetailAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.d("AAA","add----?>?>>>>");
         com = list_com.get(position);
-        convertView = layoutInflater.inflate(R.layout.lostandfound_detail_item, null);
-
-        TextView content = (TextView) convertView.findViewById(R.id.lost_found_detail_content);
-        TextView nickname = (TextView) convertView.findViewById(R.id.lost_found_detail_nickname);
-        TextView time = (TextView) convertView.findViewById(R.id.lost_found_detail_time);
-
-        content.setText(com.getContent());
-        nickname.setText(com.getNickname());
-        time.setText(com.getTime());
+        ViewHolder holder = null;
+        if(convertView == null){
+            convertView = layoutInflater.inflate(R.layout.lostandfound_detail_item, null);
+            holder = new ViewHolder();
+            holder.content = (TextView) convertView.findViewById(R.id.lost_found_detail_content);
+            holder.nickname = (TextView) convertView.findViewById(R.id.lost_found_detail_nickname);
+            holder.time = (TextView) convertView.findViewById(R.id.lost_found_detail_time);
+            convertView.setTag(holder);
+        }
+        else{
+            holder = (ViewHolder)convertView.getTag();
+        }
+        holder.content.setText(com.getContent());
+        holder.nickname.setText(com.getNickname());
+        holder.time.setText(com.getTime());
         return convertView;
+    }
+    public static class ViewHolder {
+        public TextView content;
+        public TextView nickname;
+        public TextView time;
+
     }
 }

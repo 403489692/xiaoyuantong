@@ -76,7 +76,6 @@
             android:paddingTop="10dp"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
-
     <Button
         android:id="@+id/submit"
         android:layout_width="match_parent"

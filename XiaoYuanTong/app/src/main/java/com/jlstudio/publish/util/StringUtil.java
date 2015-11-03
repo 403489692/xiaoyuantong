@@ -12,7 +12,7 @@ public class StringUtil {
     }
     public static boolean isEmpty(String... string){
         for(String s : string){
-            if(string == null ||string.equals("")){
+            if(s == null ||s.equals("")){
                 return true;
             }
         }

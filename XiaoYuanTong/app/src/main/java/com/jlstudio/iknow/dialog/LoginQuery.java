@@ -1,5 +1,6 @@
 package com.jlstudio.iknow.dialog;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import com.jlstudio.R;
 import com.jlstudio.main.activity.MainActivity;
 import com.jlstudio.main.application.Config;
 import com.jlstudio.main.bean.User;
+import com.jlstudio.weather.util.ActivityControl;
 
 
 /**
@@ -53,7 +55,9 @@ public class LoginQuery extends Dialog implements View.OnClickListener {
         switch (v.getId()){
             case R.id.sure:
                 Config.saveBaseUser(context,user);
+                Config.saveUser(context, user);
                 context.startActivity(new Intent(context, MainActivity.class));
+                ActivityControl.removeAty((Activity)context);
                 dismiss();
                 break;
             case R.id.cancle:
@@ -61,6 +65,7 @@ public class LoginQuery extends Dialog implements View.OnClickListener {
                 Intent intent = new Intent(context, MainActivity.class);
                 intent.setAction("action");
                 context.startActivity(intent);
+                ActivityControl.removeAty((Activity) context);
                 dismiss();
                 break;
         }
