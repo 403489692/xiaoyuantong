@@ -44,7 +44,6 @@ public class Config {
     public static final String USERFILE = "user";
     //缓存时间
     public static final int CATCHTIME = 1000*60 ;
-    private ProgressBar 
 
 
 
